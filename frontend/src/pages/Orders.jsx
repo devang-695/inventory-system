@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getOrders, getProducts, getCustomers, createOrder, deleteOrder } from '../services/api'
+import ConfirmModal from '../components/ConfirmModal'
 
 function Toast({ msg, type, onClose }) {
   useEffect(() => { 
@@ -35,6 +36,7 @@ export default function Orders() {
   const [toast, setToast]         = useState(null)
   const [search, setSearch]       = useState('')
   const [form, setForm]           = useState({ customer_id: '', items: [{ product_id: '', quantity: 1 }] })
+  const [deleteId, setDeleteId]   = useState(null)
 
   const load = () => getOrders().then(r => setOrders(r.data))
   
@@ -92,10 +94,10 @@ export default function Orders() {
     } finally { setLoading(false) }
   }
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to cancel and delete this order? All inventory stock will be restored.')) return
+  const handleDelete = async () => {
+    if (!deleteId) return
     try { 
-      await deleteOrder(id)
+      await deleteOrder(deleteId)
       notify('Order deleted and stock restored')
       load()
       // Refresh products list to update stock limits
@@ -103,6 +105,8 @@ export default function Orders() {
     }
     catch (e) { 
       notify('Cannot cancel order', 'error') 
+    } finally {
+      setDeleteId(null)
     }
   }
 
@@ -188,7 +192,7 @@ export default function Orders() {
                         </svg>
                         Details
                       </button>
-                      <button className="btn btn-danger" style={{ padding: '8px 12px', fontSize: 13 }} onClick={() => handleDelete(o.id)}>
+                      <button className="btn btn-danger" style={{ padding: '8px 12px', fontSize: 13 }} onClick={() => setDeleteId(o.id)}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="3 6 5 6 21 6" />
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -326,6 +330,17 @@ export default function Orders() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        show={deleteId !== null}
+        title="Cancel Order"
+        message="Are you sure you want to cancel and delete this order? All allocated inventory stock will be returned to the product warehouse."
+        confirmText="Cancel Order"
+        cancelText="Keep Order"
+        type="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </>
   )
 }

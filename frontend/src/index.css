@@ -355,6 +355,26 @@ input, select, textarea {
   transition: var(--transition);
 }
 
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+select option {
+  background-color: var(--surface-solid);
+  color: var(--text);
+  padding: 12px;
+}
+
+select option:disabled {
+  color: var(--text-muted);
+}
+
 input:hover, select:hover, textarea:hover {
   border-color: rgba(255, 255, 255, 0.15);
 }
@@ -527,7 +547,7 @@ button:disabled, .btn:disabled {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  z-index: 9999;
+  z-index: 100000;
 }
 
 .toast {
@@ -541,6 +561,7 @@ button:disabled, .btn:disabled {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   animation: toastSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   border-left: 4px solid transparent;
+  z-index: 100001;
 }
 
 @keyframes toastSlide {

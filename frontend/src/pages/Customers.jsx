@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getCustomers, createCustomer, deleteCustomer } from '../services/api'
+import ConfirmModal from '../components/ConfirmModal'
 
 const empty = { full_name: '', email: '', phone: '' }
 
@@ -34,6 +35,7 @@ export default function Customers() {
   const [loading, setLoading]     = useState(false)
   const [toast, setToast]         = useState(null)
   const [search, setSearch]       = useState('')
+  const [deleteId, setDeleteId]   = useState(null)
 
   const load = () => getCustomers().then(r => setCustomers(r.data))
   useEffect(() => { load() }, [])
@@ -55,14 +57,16 @@ export default function Customers() {
     } finally { setLoading(false) }
   }
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this customer? All their associated order history will be deleted as well.')) return
+  const handleDelete = async () => {
+    if (!deleteId) return
     try { 
-      await deleteCustomer(id)
+      await deleteCustomer(deleteId)
       notify('Customer profile removed')
       load() 
     } catch (e) { 
       notify(e.response?.data?.detail || 'Cannot delete customer', 'error') 
+    } finally {
+      setDeleteId(null)
     }
   }
 
@@ -132,10 +136,10 @@ export default function Customers() {
                   <td>{c.phone || <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
                   <td>
                     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                      <button className="btn btn-danger" style={{ padding: '8px 12px', fontSize: 13 }} onClick={() => handleDelete(c.id)}>
+                      <button className="btn btn-danger" style={{ padding: '8px 12px', fontSize: 13 }} onClick={() => setDeleteId(c.id)}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="3 6 5 6 21 6" />
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2h4a2 2 0 0 1 2 2v2" />
                         </svg>
                         Remove
                       </button>
@@ -196,6 +200,17 @@ export default function Customers() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        show={deleteId !== null}
+        title="Remove Customer Profile"
+        message="Are you sure you want to delete this customer? All their associated order history will be deleted as well."
+        confirmText="Remove Customer"
+        cancelText="Cancel"
+        type="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </>
   )
 }
