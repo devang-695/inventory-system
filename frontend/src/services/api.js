@@ -1,17 +1,17 @@
-import axios from axios;
+import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.env.VITE_API_URL || 'http://localhost:8000',
-    headers: { 'Content-Type': 'application/json' }
-})
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+});
+
 
 
 // Products
 export const getProducts = () => api.get('/products')
-export const getProduct = (id) => api.get('/products/${id}')
-export const createProduct = (data) => api.post('/product', data)
-export const updateProduct = (id, data) => api.get('/products/${id}', data)
-export const deleteProduct = (id) => api.get('/products/${id}')
+export const getProduct = (id) => api.get(`/products/${id}`)
+export const createProduct = (data) => api.post('/products', data)
+export const updateProduct = (id, data) => api.put(`/products/${id}`, data)
+export const deleteProduct = (id) => api.delete(`/products/${id}`)
 
 // Customers
 export const getCustomers = () => api.get('/customers')

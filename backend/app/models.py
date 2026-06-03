@@ -16,7 +16,7 @@ class Product(Base):
     price             = Column(Float, nullable=False)
     quantity_in_stock = Column(Integer, nullable=False, default=0)
 
-    order_items = relationship("OrderItem", back_populates="product")
+    order_items = relationship("OrderItem", back_populates="product", cascade="all, delete-orphan")
 
     __table_args__ = (
         CheckConstraint("price >= 0",             name="ck_product_price_positive"),
@@ -32,7 +32,8 @@ class Customer(Base):
     email     = Column(String(255), nullable=False, unique=True)
     phone     = Column(String(20), nullable=True)
 
-    orders = relationship("Order", back_populates="customer")
+    orders = relationship("Order", back_populates="customer", cascade="all, delete-orphan")
+
 
 
 class Order(Base):

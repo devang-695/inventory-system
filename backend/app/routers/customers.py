@@ -40,5 +40,12 @@ def delete_customer(customer_id: int, db: Session = Depends(get_db)):
     customer = db.query(Customer).filter(Customer.id == customer_id).first()
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
-    db.delete(customer)
-    db.commit()
+    try:
+        db.delete(customer)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot delete customer because they have active orders."
+        )
